@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.mxsxll.dailydriver.ui.views.CalendarView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +64,7 @@ fun AppRoot() {
                 color = Color.Black
             ) {
                 when (selectedTab) {
-                    Tab.Home -> BlankScreen()
+                    Tab.Home -> CalendarView()
                     Tab.Search -> BlankScreen()
                     Tab.Profile -> BlankScreen()
                 }
@@ -71,6 +72,7 @@ fun AppRoot() {
         }
     }
 }
+
 
 @Composable
 fun BlankScreen() {

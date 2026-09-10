@@ -85,7 +85,7 @@ fun AppRoot() {
                         val month = SimpleDateFormat("MMM", Locale.getDefault()).format(c.time)
                         val timetable = WeekTemplate()
 
-                        CalendarView(monthLabel = month, timetable = timetable, week = week)
+                        CalendarView(monthLabel = month, timetable=timetable, week = week)
                     }
                     Tab.Search -> BlankScreen()
                     Tab.Profile -> BlankScreen()

@@ -6,15 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.mxsxll.dailydriver.calender.WeekTemplate
 import java.time.LocalDate
 
@@ -22,6 +26,7 @@ private val Orange = Color(0xFFFF6D1F)
 private val CellBorder = Color(0xFF2A2A2A)
 private val TimeColumnWidth = 56.dp
 private val HourRowHeight = 80.dp
+private val MinuteHeight = HourRowHeight / 60
 
 data class CalendarDay(
     val label: String,   // "Mo", "Di", ...
@@ -100,23 +105,66 @@ fun CalendarView(
                     }
                 }
 
-                // Day columns grid
-                Row(
+                Box(
                     modifier = Modifier
                         .weight(1f)
+                        .fillMaxWidth()
                         .verticalScroll(scrollState)
                 ) {
-                    val activeBlocks = timetable.showTasksWeek()
-                    days.forEach { day ->
-                        Column(modifier = Modifier.weight(1f)) {
-                            for (hour in startHour until endHour) {
+                    // Grid
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        days.forEach { day ->
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                for (hour in startHour until endHour) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(HourRowHeight)
+                                            .border(
+                                                width = 0.5.dp,
+                                                color = CellBorder
+                                            )
+                                            .background(
+                                                if (day.isToday)
+                                                    Color(0xFF1A0E00)
+                                                else
+                                                    Color.Black
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Overlay
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(0.98f) // slightly narrower
+                            .align(Alignment.TopCenter)
+                            .zIndex(1f)
+                    ) {
+                        days.forEach { day ->
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
                                 Box(
                                     modifier = Modifier
+                                        .offset(
+                                            y = MinuteHeight * 30
+                                        )
+                                        .clip(RoundedCornerShape(8.dp))
                                         .fillMaxWidth()
-                                        .height(HourRowHeight)
-                                        .border(width = 0.5.dp, color = CellBorder)
+                                        .border(
+                                            width = 0.8.dp,
+                                            color = CellBorder
+                                        )
+                                        .height(MinuteHeight * 190)
                                         .background(
-                                            if (day.isToday) Color(0xFF1A0E00) else Color.Black
+                                            Color(0xFFDF6D1F)
                                         )
                                 )
                             }

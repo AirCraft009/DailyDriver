@@ -6,5 +6,6 @@ import kotlinx.datetime.LocalTime
 
 class RepeatedEntry(createdWeek: Int, dayInd: WeekDay, weekPer: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color) : CalenderEntry(createdWeek, start, end, name, desc, col)  {
     val day = dayInd
+    val baseWeek = createdWeek
     val weekPeriod = weekPer
 }

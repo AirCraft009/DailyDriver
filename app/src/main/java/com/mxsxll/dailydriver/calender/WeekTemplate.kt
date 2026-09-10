@@ -12,7 +12,7 @@ class WeekTemplate {
     fun showTasksWeek(week: Int): ArrayList<CalenderEntry>{
         val activeEntries: ArrayList<CalenderEntry> = ArrayList(repeatedEntries.size + scheduledEntries.size)
         for (entry in repeatedEntries){
-            if(week % entry.weekPeriod != 0)
+            if(week - entry.createdWeek % entry.weekPeriod != 0)
                 continue
             activeEntries.add(entry)
         }
@@ -27,6 +27,6 @@ class WeekTemplate {
     }
 
     fun newRepeatableEntry(createdWeek: Int, dayInd: WeekDay, weekPer: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color){
-        repeatedEntries.add(RepeatedEntry())
+        repeatedEntries.add(RepeatedEntry(createdWeek, dayInd, weekPer, start, end, name, desc, col))
     }
 }

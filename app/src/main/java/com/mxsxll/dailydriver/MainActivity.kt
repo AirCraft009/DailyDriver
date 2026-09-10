@@ -1,9 +1,13 @@
 package com.mxsxll.dailydriver
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.mxsxll.dailydriver.calender.WeekTemplate
 import com.mxsxll.dailydriver.ui.views.CalendarView
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,6 +48,7 @@ sealed class Tab(val label: String) {
 
 private val tabs = listOf(Tab.Home, Tab.Search, Tab.Profile)
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppRoot() {
     MaterialTheme {
@@ -64,7 +74,19 @@ fun AppRoot() {
                 color = Color.Black
             ) {
                 when (selectedTab) {
-                    Tab.Home -> CalendarView()
+                    Tab.Home -> {
+                        // Source - https://stackoverflow.com/a/61414652
+                        // Posted by J7bits
+                        // Retrieved 2026-09-09, License - CC BY-SA 4.0
+
+                        val c = Calendar.getInstance()
+
+                        val week = c.get(Calendar.WEEK_OF_YEAR)
+                        val month = SimpleDateFormat("MMM", Locale.getDefault()).format(c.time)
+                        val timetable = WeekTemplate()
+
+                        CalendarView(monthLabel = month, timetable = timetable, week = week)
+                    }
                     Tab.Search -> BlankScreen()
                     Tab.Profile -> BlankScreen()
                 }

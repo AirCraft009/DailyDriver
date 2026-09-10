@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mxsxll.dailydriver.calender.WeekTemplate
 import java.time.LocalDate
 
 private val Orange = Color(0xFFFF6D1F)
@@ -31,10 +32,12 @@ data class CalendarDay(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarView(
-    monthLabel: String = "Sep.",
+    monthLabel: String = "Sep",
+    week: Int,
     days: List<CalendarDay> = defaultWeek(),
     startHour: Int = 8,
-    endHour: Int = 18
+    endHour: Int = 18,
+    timetable: WeekTemplate
 ) {
     Box(
         modifier = Modifier
@@ -43,18 +46,25 @@ fun CalendarView(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Month label, top left
-            Text(
-                text = monthLabel,
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
-            )
-
-            // Day-of-week header row
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.width(TimeColumnWidth))
+            // Month label + day-of-week header row, sharing one Row so the
+            // (shorter, single-line) month label is vertically centered
+            // against the (taller, two-line) day header cells instead of
+            // being pinned to the top and ending up higher than them.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = monthLabel,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .width(TimeColumnWidth)
+                        .padding(start = 16.dp)
+                )
                 days.forEach { day ->
                     DayHeaderCell(day)
                 }
@@ -96,6 +106,7 @@ fun CalendarView(
                         .weight(1f)
                         .verticalScroll(scrollState)
                 ) {
+                    val activeBlocks = timetable.showTasksWeek()
                     days.forEach { day ->
                         Column(modifier = Modifier.weight(1f)) {
                             for (hour in startHour until endHour) {

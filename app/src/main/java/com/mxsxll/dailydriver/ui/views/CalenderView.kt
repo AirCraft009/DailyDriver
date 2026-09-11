@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.mxsxll.dailydriver.calender.WeekTemplate
 import java.time.LocalDate
+import java.time.LocalTime
 
 private val Orange = Color(0xFFFF6D1F)
 private val CellBorder = Color(0xFF2A2A2A)
@@ -44,6 +45,8 @@ fun CalendarView(
     endHour: Int = 18,
     timetable: WeekTemplate
 ) {
+    val activeEntries = timetable.showTasksWeek(week)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -147,26 +150,42 @@ fun CalendarView(
                             .align(Alignment.TopCenter)
                             .zIndex(1f)
                     ) {
-                        days.forEach { day ->
+                        days.forEachIndexed { dayInd, day ->
                             Column(
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .offset(
-                                            y = MinuteHeight * 30
-                                        )
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .fillMaxWidth()
-                                        .border(
-                                            width = 0.8.dp,
-                                            color = CellBorder
-                                        )
-                                        .height(MinuteHeight * 190)
-                                        .background(
-                                            Color(0xFFDF6D1F)
-                                        )
-                                )
+                                var lastOffset = 0 // minutes already "consumed" in this column
+
+                                val dayEntries = activeEntries
+                                    .filter { it.dayInd == dayInd }
+                                    .sortedBy { it.startTime } // important, otherwise gaps can go negative
+
+
+                                for (entry in dayEntries) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .fillMaxWidth()
+                                            .border(
+                                                width = 0.8.dp,
+                                                color = CellBorder
+                                            )
+                                            .height(MinuteHeight * 20)
+                                            .background(
+                                                Color(0xFFDF6D1F)
+                                            )
+                                    )
+                                    val entryOffset = (entry.startTime.hour - startHour) * 60 + entry.startTime.minute
+                                    val gap = entryOffset - lastOffset
+
+                                    if (gap > 0) {
+                                        Spacer(modifier = Modifier.height(MinuteHeight * gap))
+                                    }
+
+                                    TimeBlock(entry.duration.inWholeMinutes.toInt())
+
+                                    lastOffset = entryOffset + entry.duration.inWholeMinutes.toInt()
+                                }
                             }
                         }
                     }
@@ -174,6 +193,23 @@ fun CalendarView(
             }
         }
     }
+}
+
+@Composable
+private fun TimeBlock(length: Int){
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .border(
+                width = 0.8.dp,
+                color = CellBorder
+            )
+            .height(MinuteHeight * length)
+            .background(
+                Color(0xFFDF6D1F)
+            )
+    )
 }
 
 @Composable

@@ -1,5 +1,6 @@
 package com.mxsxll.dailydriver.calender
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.mxsxll.dailydriver.data.WeekDay
 import kotlinx.datetime.LocalTime
@@ -22,11 +23,15 @@ class WeekTemplate {
                 continue
             activeEntries.add(entry)
         }
-
+        Log.i("WTF", "HERER")
+        if(activeEntries.isNotEmpty())
+            Log.i("WTF","GOOD")
+        else
+            Log.i("WTF", "BAD")
         return activeEntries
     }
 
-    fun newRepeatableEntry(createdWeek: Int, dayInd: WeekDay, weekPer: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color){
+    fun newRepeatableEntry(createdWeek: Int, dayInd: Int, weekPer: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color){
         repeatedEntries.add(RepeatedEntry(createdWeek, dayInd, weekPer, start, end, name, desc, col))
     }
 }

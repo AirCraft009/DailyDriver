@@ -5,7 +5,7 @@ import com.mxsxll.dailydriver.data.durationBetween
 import kotlinx.datetime.LocalTime
 import kotlin.time.Duration
 
-public abstract class CalenderEntry(currentWeek: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color) {
+public abstract class CalenderEntry(day: Int, currentWeek: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color) {
     val startTime: LocalTime = start
     val endTime: LocalTime = end
     val title: String = name
@@ -13,4 +13,5 @@ public abstract class CalenderEntry(currentWeek: Int, start: LocalTime, end: Loc
     val color: Color = col
     val duration: Duration = durationBetween(start, end)
     val createdWeek: Int = currentWeek
+    val dayInd: Int = day
 }

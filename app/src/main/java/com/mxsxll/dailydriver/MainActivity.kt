@@ -25,10 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import com.mxsxll.dailydriver.calender.WeekTemplate
 import com.mxsxll.dailydriver.ui.views.CalendarView
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -84,7 +86,7 @@ fun AppRoot() {
                         val week = c.get(Calendar.WEEK_OF_YEAR)
                         val month = SimpleDateFormat("MMM", Locale.getDefault()).format(c.time)
                         val timetable = WeekTemplate()
-
+                        timetable.newRepeatableEntry(5, 2, 1, LocalTime(10, 0, 0, 0), LocalTime(12, 25, 0, 0), "Help", "Help mee" , Blue)
                         CalendarView(monthLabel = month, timetable=timetable, week = week)
                     }
                     Tab.Search -> BlankScreen()

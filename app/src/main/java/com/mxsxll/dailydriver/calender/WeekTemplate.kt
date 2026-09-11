@@ -13,9 +13,9 @@ class WeekTemplate {
     fun showTasksWeek(week: Int): ArrayList<CalenderEntry>{
         val activeEntries: ArrayList<CalenderEntry> = ArrayList(repeatedEntries.size + scheduledEntries.size)
         for (entry in repeatedEntries){
-            if(week - entry.createdWeek % entry.weekPeriod != 0)
-                continue
-            activeEntries.add(entry)
+            if((week - entry.createdWeek) % entry.weekPeriod == 0) {
+                activeEntries.add(entry)
+            }
         }
 
         for (entry in scheduledEntries){
@@ -23,15 +23,14 @@ class WeekTemplate {
                 continue
             activeEntries.add(entry)
         }
-        Log.i("WTF", "HERER")
-        if(activeEntries.isNotEmpty())
-            Log.i("WTF","GOOD")
-        else
-            Log.i("WTF", "BAD")
         return activeEntries
     }
 
     fun newRepeatableEntry(createdWeek: Int, dayInd: Int, weekPer: Int, start: LocalTime, end: LocalTime, name: String, desc: String, col: Color){
         repeatedEntries.add(RepeatedEntry(createdWeek, dayInd, weekPer, start, end, name, desc, col))
+    }
+
+    fun addRepeatableEntry(entry: RepeatedEntry){
+        repeatedEntries.add(entry)
     }
 }

@@ -8,10 +8,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
@@ -35,6 +48,7 @@ data class CalendarDay(
     val isToday: Boolean = false
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarView(
@@ -45,7 +59,13 @@ fun CalendarView(
     endHour: Int = 18,
     timetable: WeekTemplate
 ) {
-    val activeEntries = timetable.showTasksWeek(week)
+    val activeEntries  by remember { mutableStateOf(timetable.showTasksWeek(week)) }
+    var showPopup by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var start by remember { mutableStateOf(true) }
+    var taskName: String by remember { mutableStateOf("") }
+    var pickedStart: Int
+    var pickedEnd: Int
 
     Box(
         modifier = Modifier
@@ -64,15 +84,121 @@ fun CalendarView(
                     .padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = monthLabel,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                Box(
                     modifier = Modifier
                         .width(TimeColumnWidth)
-                        .padding(start = 16.dp)
-                )
+                ){
+                    Text(
+                        text = monthLabel,
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .width(TimeColumnWidth)
+                            .padding(start = 16.dp)
+                            .zIndex(1.1f)
+                    )
+                    Button(
+                        onClick = { showPopup = true },
+                        modifier = Modifier.alpha(0f)
+                            .zIndex(4.5f)
+                    ) { }
+                }
+                if (showPopup) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showPopup = false
+                        },
+                        text = {
+                            Column {
+                                TextField(
+                                    value = taskName,
+                                    onValueChange = { taskName = it },
+                                    label = { Text("Task Name") }
+                                )
+
+                                Spacer(Modifier.height(16.dp))
+
+                                Row {
+                                    Button(
+                                        onClick = {
+                                            showTimePicker = true
+                                            start = true
+                                        }
+                                    ) {
+                                        Text("Start Time")
+                                    }
+
+                                    Spacer(Modifier.width(40.dp))
+
+                                    Button(
+                                        onClick = {
+                                            showTimePicker = true
+                                            start = false
+                                        }
+                                    ) {
+                                        Text("End Time")
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showPopup = false
+                                }
+                            ) {
+                                Text("Save")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    showPopup = false
+                                }
+                            ) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
+                if (showTimePicker) {
+                    val timePickerState = rememberTimePickerState()
+
+                    TimePickerDialog(
+                        onDismissRequest = {
+                            showTimePicker = false
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    if(start){
+                                        pickedStart = timePickerState.hour * 60 + timePickerState.minute
+                                    }
+                                    else{
+                                        pickedEnd = timePickerState.hour * 60 + timePickerState.minute
+                                    }
+                                    // Use hour/minute here
+                                    showTimePicker = false
+                                }
+                            ) {
+                                Text("OK")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = {
+                                    showTimePicker = false
+                                }
+                            ) {
+                                Text("Cancel")
+                            }
+                        },
+                        title = {}
+                    ) {
+                        TimePicker(state = timePickerState)
+                    }
+                }
                 days.forEach { day ->
                     DayHeaderCell(day)
                 }
@@ -162,19 +288,6 @@ fun CalendarView(
 
 
                                 for (entry in dayEntries) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .fillMaxWidth()
-                                            .border(
-                                                width = 0.8.dp,
-                                                color = CellBorder
-                                            )
-                                            .height(MinuteHeight * 20)
-                                            .background(
-                                                Color(0xFFDF6D1F)
-                                            )
-                                    )
                                     val entryOffset = (entry.startTime.hour - startHour) * 60 + entry.startTime.minute
                                     val gap = entryOffset - lastOffset
 
